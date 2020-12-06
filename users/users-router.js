@@ -1,0 +1,86 @@
+const express = require('express')
+
+const router = express.Router()
+
+const Users = require('./users-model')
+
+router.get('/', (req, res) => {
+    Users.getUsers()
+        .then(users => {
+            res.status(200).json(users)
+        })
+        .catch(error => {
+            console.log(error)
+            res.status(500).json({ errorMessage: 'Error getting all users' })
+        })
+})
+
+router.get('/:id/books', (req, res) => {
+    const { id } = req.params
+    Users.getUserBookList(id)
+        .then(books => {
+            if (books) {
+                res.status(200).json(books)
+            } else {
+                res.status(404).json({ errorMessage: 'Couldnt not find books for that User' })
+            }
+        })
+        .catch(error => {
+            console.log(error)
+            res.status(500).json({ errorMessage: 'Error getting Books' })
+        })
+})
+
+router.get('/:id', (req, res) => {
+    const { id } = req.params
+    Users.getUser(id)
+        .then(user => {
+            if (user) {
+                res.status(200).json(user)
+            } else {
+                res.status(404).json({ errorMessage: 'Could not find user with that Id' })
+            }
+        })
+        .catch(error => {
+            console.log(error)
+            res.status(500).json({ errorMessage: 'Error getting user' })
+        })
+})
+
+router.put('/:id', (req, res) => {
+    const { id } = req.params
+    const changes = req.body
+    Users.getUser(id)
+        .then(user => {
+            if (user) {
+                Users.updateUser(changes, id)
+                    .then(updatedUser => {
+                        res.status(200).json({ Updated: `User with id: ${id}` })
+                    })
+            } else {
+                res.status(404).json({ errorMessage: 'Could not find User with that id' })
+            }
+        })
+        .catch(error => {
+            console.log(error)
+            res.status(500).json({ errorMessage: 'Failed to update User' })
+        })
+})
+
+router.delete('/:id', (req, res) => {
+    const { id } = req.params
+    Users.remove(id)
+        .then(deleted => {
+            if (deleted) {
+                res.status(200).json({ Removed: `User with id: ${id}` })
+            } else {
+                res.status(404).json({ errorMessage: 'Could not find User with that id' })
+            }
+        })
+        .catch(error => {
+            console.log(error)
+            res.status(500).json({ errorMessage: 'Error deleting user' })
+        })
+})
+
+module.exports = router;
