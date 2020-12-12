@@ -16,7 +16,7 @@ server.use(express.json())
 
 
 server.use('/api/auth', AuthRouter)
-server.use('/api/auth/users', restrictedMiddleware, UserRouter)
+server.use('/api/auth/users', UserRouter)
 server.use('/api/auth/books', restrictedMiddleware, BooksRouter)
 
 server.get('/', (req, res) => {
